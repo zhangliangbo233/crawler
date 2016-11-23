@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maiya.dal.dao.myCrawler.CrawlProxyDao">
+
+    <select id="listProxy" resultType="CrawlProxy">
+        SELECT id,proxy_ip,proxy_port,location,anonym,create_time
+        FROM crawl_crawl_proxy
+        WHERE status=1
+        <if test="location != null and location != '' ">
+            AND location like concat('%', #{location}, '%')
+        </if>
+        ORDER BY id DESC limit 100;
+    </select>
+
+    <!--只保留最新的1000条-->
+    <delete id="delete">
+        <![CDATA[
+
+         DELETE from crawl_crawl_proxy
+            where id < (select * from (SELECT id from crawl_crawl_proxy ORDER BY id desc LIMIT 1000,1) t);
+
+        ]]>
+    </delete>
+
+    <!--删除不可用的代理-->
+    <delete id="deleteUnavailable">
+         DELETE from crawl_crawl_proxy where id = #{id};
+    </delete>
+
+    <update id="updateUnavailable" parameterType="CrawlProxy">
+        UPDATE crawl_crawl_proxy SET status = 0,update_time = #{updateTime} WHERE id=#{id};
+    </update>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        insert into crawl_crawl_proxy (proxy_ip,proxy_port,location,anonym,create_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.proxyIp},#{item.proxyPort},#{item.location},#{item.anonym},#{item.createTime})
+        </foreach>
+    </insert>
+
+</mapper>

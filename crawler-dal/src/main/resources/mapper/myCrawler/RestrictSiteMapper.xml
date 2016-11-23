@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maiya.dal.dao.myCrawler.RestrictSiteDao">
+
+	<select id="listNeedCrawlSites" parameterType="java.lang.Long" resultType="RestrictSite">
+        SELECT * FROM crawl_restrict_site WHERE is_need_crawl=1
+        <if test="siteType != null">
+            AND id = #{siteType}
+        </if>
+
+    </select>
+
+    <select id="findById" resultType="RestrictSite">
+        SELECT id,site_url,site_data_url,result_list_element,result_list_attr,result_level
+            FROM crawl_restrict_site WHERE id=#{id};
+    </select>
+
+</mapper>

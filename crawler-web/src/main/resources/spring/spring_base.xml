@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.maiya.common.util,com.maiya.crawling,com.maiya.parse.service,
+                        com.maiya.proxy.service"/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <!-- 标准配置 -->
+                <value>classpath:application.properties</value>
+            </list>
+        </property>
+        <property name="fileEncoding" value="UTF-8"/>
+    </bean>
+
+    <!--mq链接factory-->
+    <bean id="connectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory">
+        <property name="connectionFactory">
+            <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+                <property name="brokerURL" value="${activemq.url}"/>
+            </bean>
+        </property>
+        <property name="maxConnections" value="100"/>
+    </bean>
+
+    <bean id="hbaseUtil" class="com.maiya.common.util.HbaseUtil"/>
+
+    <bean id="springContextHolder" class="com.maiya.common.util.SpringContextHolder"/>
+
+    <bean id="mqConfigRegister" class="com.maiya.common.util.MqConfigAnnotationRegister"
+          depends-on="springContextHolder,connectionFactory,parseRestrictCrawlDataQueue"/>
+    <bean id="parseRestrictCrawlDataQueue" class="org.apache.activemq.command.ActiveMQQueue"/>
+    <bean id="parseJDCrawlDataQueue" class="org.apache.activemq.command.ActiveMQQueue"/>
+    <bean id="parseTaoBaoCrawlDataQueue" class="org.apache.activemq.command.ActiveMQQueue"/>
+    <bean id="parseJDAddressCrawlDataQueue" class="org.apache.activemq.command.ActiveMQQueue"/>
+    <bean id="parseTaoBaoAddressCrawlDataQueue" class="org.apache.activemq.command.ActiveMQQueue"/>
+    <bean id="mqMessageSender" class="com.maiya.common.util.MqMessageSender">
+        <property name="connectionFactory" ref="connectionFactory"/>
+    </bean>
+
+    <!-- 异步线程池 -->
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="10"/>
+        <property name="maxPoolSize" value="200"/>
+        <!-- 队列最大长度 -->
+        <property name="queueCapacity" value="500"/>
+        <property name="keepAliveSeconds" value="20"/>
+        <!-- 线程池对拒绝任务(无线程可用)的处理策略 -->
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
+        </property>
+        <property name="threadNamePrefix" value="maiya_executor_"/>
+    </bean>
+
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+        <constructor-arg>
+            <bean class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">
+                <constructor-arg>
+                    <bean class="com.maiya.common.util.HttpUtil" factory-method="acceptsUntrustedCertsHttpClient"/>
+                </constructor-arg>
+                <property name="connectTimeout" value="${http.client.connect.time.out}"/>
+                <property name="readTimeout" value="${http.client.read.time.out}"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+
+</beans>
+

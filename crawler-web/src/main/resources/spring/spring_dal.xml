@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.maiya.dal.route,com.maiya.dal.dao"/>
+
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    <tx:annotation-driven transaction-manager="creditTransactionManager"/>
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <!-- 标准配置 -->
+                <value>classpath:db.properties</value>
+            </list>
+        </property>
+        <property name="fileEncoding" value="UTF-8"/>
+    </bean>
+
+    <!-- 爬虫项目mysql数据源 -->
+    <bean id="crawlReadMysqlDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${jdbc.mysql.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.mysql.url}"/>
+        <property name="user" value="${jdbc.mysql.username}"/>
+        <property name="password" value="${jdbc.mysql.password}"/>
+        <property name="initialPoolSize" value="${jdbc.mysql.initialPoolSize}"/>
+        <property name="minPoolSize" value="${jdbc.mysql.minPoolSize}"/>
+        <property name="maxPoolSize" value="${jdbc.mysql.maxPoolSize}"/>
+        <property name="maxIdleTime" value="${jdbc.mysql.maxIdleTime}"/>
+        <property name="acquireIncrement" value="${jdbc.mysql.acquireIncrement}"/>
+        <property name="idleConnectionTestPeriod" value="${jdbc.mysql.idleConnectionTestPeriod}"/>
+        <property name="acquireRetryAttempts" value="${jdbc.mysql.acquireRetryAttempts}"/>
+        <property name="breakAfterAcquireFailure" value="${jdbc.mysql.breakAfterAcquireFailure}"/>
+        <property name="maxStatements" value="${jdbc.mysql.maxStatements}"/>
+        <property name="testConnectionOnCheckout" value="${jdbc.mysql.testConnectionOnCheckout}"/>
+    </bean>
+
+    <!-- 爬虫项目mysql数据源 -->
+    <bean id="crawlWriteMysqlDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${jdbc.mysql.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.mysql.url}"/>
+        <property name="user" value="${jdbc.mysql.username}"/>
+        <property name="password" value="${jdbc.mysql.password}"/>
+        <property name="initialPoolSize" value="${jdbc.mysql.initialPoolSize}"/>
+        <property name="minPoolSize" value="${jdbc.mysql.minPoolSize}"/>
+        <property name="maxPoolSize" value="${jdbc.mysql.maxPoolSize}"/>
+        <property name="maxIdleTime" value="${jdbc.mysql.maxIdleTime}"/>
+        <property name="acquireIncrement" value="${jdbc.mysql.acquireIncrement}"/>
+        <property name="idleConnectionTestPeriod" value="${jdbc.mysql.idleConnectionTestPeriod}"/>
+        <property name="acquireRetryAttempts" value="${jdbc.mysql.acquireRetryAttempts}"/>
+        <property name="breakAfterAcquireFailure" value="${jdbc.mysql.breakAfterAcquireFailure}"/>
+        <property name="maxStatements" value="${jdbc.mysql.maxStatements}"/>
+        <property name="testConnectionOnCheckout" value="${jdbc.mysql.testConnectionOnCheckout}"/>
+    </bean>
+
+    <bean id="crawlSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean" depends-on="dataSource">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="mapperLocations" value="classpath:mapper/myCrawler/*.xml"/>
+        <property name="typeAliasesPackage" value="com.maiya.dal.model"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="crawlSqlSessionFactory"/>
+        <property name="basePackage" value="com.maiya.dal.dao.myCrawler"/>
+    </bean>
+
+    <!--征信项目mysql数据源-->
+    <bean id="creditMysqlDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+          destroy-method="close">
+        <property name="driverClass" value="${jdbc.mysql.driver}"/>
+        <property name="jdbcUrl" value="${jdbc.mysql.url.maiyazx}"/>
+        <property name="user" value="${jdbc.mysql.username.maiyazx}"/>
+        <property name="password" value="${jdbc.mysql.password.maiyazx}"/>
+        <property name="initialPoolSize" value="${jdbc.mysql.initialPoolSize}"/>
+        <property name="minPoolSize" value="${jdbc.mysql.minPoolSize}"/>
+        <property name="maxPoolSize" value="${jdbc.mysql.maxPoolSize}"/>
+        <property name="maxIdleTime" value="${jdbc.mysql.maxIdleTime}"/>
+        <property name="acquireIncrement" value="${jdbc.mysql.acquireIncrement}"/>
+        <property name="idleConnectionTestPeriod" value="${jdbc.mysql.idleConnectionTestPeriod}"/>
+        <property name="acquireRetryAttempts" value="${jdbc.mysql.acquireRetryAttempts}"/>
+        <property name="breakAfterAcquireFailure" value="${jdbc.mysql.breakAfterAcquireFailure}"/>
+        <property name="maxStatements" value="${jdbc.mysql.maxStatements}"/>
+        <property name="testConnectionOnCheckout" value="${jdbc.mysql.testConnectionOnCheckout}"/>
+    </bean>
+    <bean id="creditSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="creditMysqlDataSource"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="mapperLocations" value="classpath:mapper/credit/*.xml"/>
+        <property name="typeAliasesPackage" value="com.maiya.dal.model"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="creditSqlSessionFactory"/>
+        <property name="basePackage" value="com.maiya.dal.dao.credit"/>
+    </bean>
+
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="creditTransactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="creditMysqlDataSource"/>
+    </bean>
+
+</beans>
+

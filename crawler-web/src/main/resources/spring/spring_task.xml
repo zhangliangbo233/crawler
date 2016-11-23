@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/task
+		http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <description>Spring定时任务</description>
+
+    <context:component-scan base-package="com.maiya.task"/>
+
+    <task:annotation-driven executor="jobTaskExecutor"/>
+    <task:executor id="jobTaskExecutor" rejection-policy="CALLER_RUNS" pool-size="5-20" queue-capacity="100"
+                   keep-alive="10"/>
+
+    <task:scheduled-tasks>
+        <!--更新代理信息-->
+        <task:scheduled ref="crawlProxyTaskService" method="doRenew" cron="0 0/10 * * * ?"/>
+
+        <!--历史数据抓取
+        <task:scheduled ref="restrictCrawlTaskService" method="historyUserCrawl" cron="0 0 22 * * ?"/>
+        -->
+       
+         <!--抓取失败的定时任务  -->
+        <task:scheduled ref="restrictCrawlTaskService" method="retryCrawl" cron="0 0/30 * * * ?"/>
+      
+        <!--抓取京东失败的定时任务  -->
+        <task:scheduled ref="JDCrawlTaskService" method="retryCrawl" cron="0 0/10 * * * ?"/>
+     
+        <!--抓取未授权的京东用户定时作务  
+        <task:scheduled ref="JDCrawlTaskService" method="unAuthorCrawl" cron="0 */30 * * * ?"/>
+        -->
+        <!--抓取淘宝失败的定时任务-->
+        <task:scheduled ref="taoBaoCrawlTaskService" method="retryCrawl" cron="0 0/10 * * * ?"/>
+
+        <!--抓取未授权的淘宝用户定时作务
+        <task:scheduled ref="taoBaoCrawlTaskService" method="unAuthorCrawl" cron="0 */30 * * * ?"/>
+        -->
+
+    </task:scheduled-tasks>
+</beans>
+
+
+
+
+
+

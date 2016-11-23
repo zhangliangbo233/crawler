@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maiya.dal.dao.myCrawler.CrawlB2CRetryTaskDao">
+
+    <select id="listRetryTasks" resultType="CrawlB2CRetryTask">
+        SELECT id,site,user_channel,user_city,user_identity,retry_num,status,create_time,update_time FROM crawl_b2c_retry_task WHERE status = 0 and site=#{site} ORDER BY create_time asc limit 20
+    </select>
+
+    <insert id="insert" parameterType="CrawlB2CRetryTask">
+        insert into crawl_b2c_retry_task (site,user_identity,user_channel,status,create_time,reason)
+          values
+            (#{site},#{userIdentity},#{userChannel},#{status},#{createTime},#{reason});
+    </insert>
+
+    <update id="update" parameterType="CrawlB2CRetryTask">
+        UPDATE crawl_b2c_retry_task
+          SET retry_num = #{retryNum},status = #{status},update_time = #{updateTime} WHERE id=#{id};
+    </update>
+    
+     <select id="findById" resultType="CrawlB2CRetryTask">
+        SELECT id,site,user_channel,user_city,user_identity,retry_num,status,create_time,update_time FROM crawl_b2c_retry_task  WHERE id=#{id};
+    </select>
+
+
+</mapper>

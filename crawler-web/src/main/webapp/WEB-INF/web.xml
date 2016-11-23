@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="webapp-crawling" version="2.5">
+
+	<context-param>
+		<param-name>appName</param-name>
+		<param-value>myCrawler</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:spring/spring_base.xml
+			classpath:spring/spring_dal.xml
+			classpath:spring/spring_redis.xml
+		</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>com.maiya.web.webmvc.MaiyaContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- Spring Controller 分发-->
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>com.maiya.web.webmvc.MaiyaDispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>
+				classpath:spring/spring_web.xml
+			</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<filter>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+</web-app>

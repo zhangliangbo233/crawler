@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maiya.dal.dao.credit.ZlPrivateEncryptDao">
+
+    <select id="queryZlPrivateEncryptByUserId"  resultType="com.maiya.dal.model.ZlPrivateEncrypt">
+      <![CDATA[
+        SELECT sUserId,sInfoType,sPrivateKey FROM zl_private_encrypt
+              WHERE iDelFlag=1 and  sUserId= #{0} and sInfoType=#{1}
+          
+        ]]>        
+    </select>
+
+
+    <insert id="insert" parameterType="com.maiya.dal.model.ZlPrivateEncrypt">
+        insert into zl_private_encrypt (sGuid,sUserId,sPrivateKey,sInfoType,iDelFlag)
+        values (#{sGuid},#{sUserId},#{sPrivateKey},#{sInfoType},#{iDelFlag})
+    </insert>
+
+</mapper>

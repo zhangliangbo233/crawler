@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+
+    <!--<property resource="application.properties" />-->
+    <property name="logs.path" value="/usr/local/tomcat/tomcat_log/myCrawler-web" />
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE-APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 输出日志到文件 每天一个文件 -->
+    <appender name="DEFAULT-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logs.path}/logs/myCrawler/myCrawler-default.%d{yyyy-MM-dd}.log</FileNamePattern>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--请求摘要日志-->
+    <appender name="PAGE-DIGEST-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logs.path}/logs/myCrawler/myCrawler-pageDigest.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--mybatis sql 日志-->
+    <appender name="SQL_MYBATIS-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logs.path}/logs/myCrawler/myCrawler-sql.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} -%msg%n</pattern>
+        </encoder>
+    </appender>
+    
+        <!--错误日志-->
+    <appender name="ERROR-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter" >
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${logs.path}/logs/myCrawler/myCrawler-error.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread]  %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="PAGE-DIGEST" additivity="false" level="INFO">
+        <appender-ref ref="PAGE-DIGEST-APPENDER"/>
+    </logger>
+
+    <!--mybatis日志-->
+    <logger name="org.mybatis" additivity="false" level="ERROR">
+        <appender-ref ref="SQL_MYBATIS-APPENDER"/>
+        <appender-ref ref="CONSOLE-APPENDER"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="DEFAULT-APPENDER"/>
+        <appender-ref ref="CONSOLE-APPENDER"/>
+        <appender-ref ref="ERROR-APPENDER" />
+    </root>
+
+</configuration>

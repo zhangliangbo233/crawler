@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.maiya.dal.dao.credit.MemberIntenetInfoDao">
+
+    <select id="queryMemberIntenetInfoByUserId" resultType="com.maiya.dal.model.MemberIntenetInfo">
+      <![CDATA[
+
+        SELECT sUserId,sTaoBao,sTaoBaoPassword,sJingDong,sJingDongPassword FROM hy_memberintenetinfo
+              WHERE  sUserId= #{userId}
+
+        ]]>
+    </select>
+
+
+    <update id="updateJDAuthorFlagByUserId">
+        UPDATE hy_memberintenetinfo
+          SET  iJDAuthorFlag= #{1}  WHERE sUserId= #{0}
+    </update>
+
+    <update id="updateTaoBaoAuthorFlagByUserId">
+        UPDATE hy_memberintenetinfo
+          SET  iTaoBaoAuthorFlag= #{1}  WHERE sUserId= #{0}
+    </update>
+
+
+    <insert id="insert" parameterType="com.maiya.dal.model.MemberIntenetInfo">
+        insert into hy_memberintenetinfo (sGuid,sUserId,sJingDong,sJingDongPassword,sTaoBao,sTaoBaoPassword)
+        values (#{sGuid},#{sUserId},#{sJingDong},#{sJingDongPassword},#{sTaoBao},#{sTaoBaoPassword})
+    </insert>
+
+
+    <select id="queryMemberIntenetInfoByJDAuthorFlag" resultType="com.maiya.dal.model.MemberIntenetInfo">
+        <![CDATA[
+
+        SELECT sUserId,sJingDong,sJingDongPassword FROM hy_memberintenetinfo WHERE iJDAuthorFlag=#{0}
+
+                ORDER BY dAddDate DESC LIMIT 20
+
+        ]]>
+    </select>
+
+
+    <select id="queryMemberIntenetInfoByTBAuthorFlag" resultType="com.maiya.dal.model.MemberIntenetInfo">
+        <![CDATA[
+
+        SELECT sUserId,sTaoBao,sTaoBaoPassword FROM hy_memberintenetinfo WHERE iTaoBaoAuthorFlag=#{0}
+
+                ORDER BY dAddDate DESC LIMIT 20
+
+        ]]>
+    </select>
+
+
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="locations">
+            <list>
+                <!-- 标准配置 -->
+                <value>classpath:redis.properties</value>
+            </list>
+        </property>
+        <property name="fileEncoding" value="UTF-8"/>
+    </bean>
+
+    <!-- spring data redis -->
+    <bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="usePool" value="true"/>
+        <property name="hostName" value="${redis.host}"/>
+        <property name="port" value="${redis.port}"/>
+        <property name="password" value="${redis.pass}"/>
+        <property name="timeout" value="${redis.timeout}"/>
+        <constructor-arg index="0" ref="jedisPoolConfig"/>
+    </bean>
+
+    <!-- jedis pool配置 -->
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="${redis.maxActive}"/>
+        <property name="maxIdle" value="${redis.maxIdle}"/>
+        <property name="maxWaitMillis" value="${redis.maxWait}"/>
+    </bean>
+
+    <bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+        <property name="connectionFactory" ref="jedisConnectionFactory"/>
+    </bean>
+
+    <bean id="redisCacheUtil" class="com.maiya.common.util.RedisCacheUtil">
+        <property name="redisTemplate" ref="redisTemplate"/>
+    </bean>
+
+</beans>
+
